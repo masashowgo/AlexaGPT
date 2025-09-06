@@ -25,7 +25,7 @@
               "type": "AMAZON.Language"
             }
           ],
-          "name": "ChatGPTIntent",
+          "name": "GeminiIntent",
           "samples": [
             "{question}"
           ]
