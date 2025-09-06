@@ -23,6 +23,30 @@ def format_string(text):
     text = re.sub(r'[\*#]', '', text) # Remove markdown-like characters
     return text
 
+def get_gemini_response(history, question):
+    """Interacts with the Gemini API and returns the response and updated history."""
+    model = genai.GenerativeModel(
+        model_name=keys.MODEL,
+        system_instruction=keys.SYSTEM_MESSAGE
+    )
+    chat = model.start_chat(history=history)
+    response = chat.send_message(question)
+    
+    speak_output = format_string(response.text)
+    
+    # Convert Content objects to a JSON-serializable list of dicts
+    updated_history = []
+    for content in chat.history:
+        # Assuming simple text parts for now
+        parts = [part.text for part in content.parts]
+        updated_history.append({'role': content.role, 'parts': parts})
+
+    # Trim history
+    if len(updated_history) > keys.MAX_CONVERSATION_HISTORY:
+        updated_history = updated_history[-keys.MAX_CONVERSATION_HISTORY:]
+        
+    return speak_output, updated_history
+
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
     def can_handle(self, handler_input):
@@ -49,31 +73,14 @@ class ChatGPTIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         session_attr = handler_input.attributes_manager.session_attributes
         
-        # Adapt conversation history for Gemini
         if "history" not in session_attr:
             session_attr["history"] = []
 
         question = handler_input.request_envelope.request.intent.slots["question"].value
         
         try:
-            # Start a chat session with history
-            model = genai.GenerativeModel(
-                model_name=keys.MODEL,
-                system_instruction=keys.SYSTEM_MESSAGE
-            )
-            chat = model.start_chat(history=session_attr["history"])
-            
-            # Send the new question
-            response = chat.send_message(question)
-            speak_output = format_string(response.text)
-            
-            # Update history
-            session_attr["history"] = [dict(part) for part in chat.history]
-            
-            # Keep the history to a reasonable size (last 10 turns)
-            if len(session_attr["history"]) > 20:
-                session_attr["history"] = session_attr["history"][-20:]
-
+            speak_output, updated_history = get_gemini_response(session_attr["history"], question)
+            session_attr["history"] = updated_history
         except Exception as e:
             logger.error(f"Error calling Gemini: {e}")
             speak_output = "すみません、うまく聞き取れませんでした。もう一度お願いします。"
@@ -105,8 +112,10 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
     """Handler for Cancel and Stop Intents."""
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
-        return (is_intent_name("AMAZON.CancelIntent")(handler_input) or
-                is_intent_name("AMAZON.StopIntent")(handler_input))
+        return (
+            is_intent_name("AMAZON.CancelIntent")(handler_input) or
+            is_intent_name("AMAZON.StopIntent")(handler_input)
+        )
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
@@ -175,8 +184,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
         )
 
 # The SkillBuilder object acts as the entry point for your skill.
-
-b = SkillBuilder()
+sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(ChatGPTIntentHandler())
