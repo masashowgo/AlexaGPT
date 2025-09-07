@@ -1,0 +1,106 @@
+# ==== Python: 仮想環境（最重要）====
+.venv/
+venv/
+
+# ==== Python: キャッシュ/ビルド ====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+.build/
+build/
+dist/
+.eggs/
+*.egg-info/
+pip-wheel-metadata/
+pip-log.txt
+
+# ==== Python: テスト/解析キャッシュ ====
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.cache/
+
+# ==== Python: ノートブック ====
+.ipynb_checkpoints/
+*.ipynb
+
+# ==== 環境ファイル ====
+.env
+.env.*
+.envrc
+
+# ==== IDE / エディタ ====
+.vscode/
+.idea/
+*.iml
+
+# ==== OSごみ ====
+.DS_Store
+Thumbs.db
+
+# ==== データベース等（必要なら調整）====
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.h5
+*.hdf5
+*.parquet
+*.feather
+*.npz
+*.npy
+
+# ===== Aggressive: 大きめバイナリ/メディア（必要に応じて解除） =====
+# 画像
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.tif
+*.tiff
+*.bmp
+*.svgz
+
+# 音声
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.m4a
+
+# 動画
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+
+# アーカイブ/ディスクイメージ
+*.zip
+*.tar
+*.gz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.iso
+*.dmg
+
+# 実行形式/その他バイナリ
+*.exe
+*.dll
+*.bin
+
+# ドキュメント（重いPDF等が多数ある場合）
+*.pdf
