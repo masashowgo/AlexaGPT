@@ -34,7 +34,7 @@
         "ja-JP": {
           "description": "Sample Full Description",
           "examplePhrases": [
-            "アレクサ、ハローワールドを開いて",
+            "アレクサ、Geminiチャットを開いて",
             "こんにちは",
             "ヘルプ"
           ],
