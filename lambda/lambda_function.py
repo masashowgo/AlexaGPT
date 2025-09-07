@@ -55,7 +55,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "ようこそ。何が知りたいですか？"
+        speak_output = "Geminiです。"
         return (
             handler_input.response_builder
                 .speak(speak_output)
