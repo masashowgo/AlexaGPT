@@ -44,34 +44,55 @@ SYSTEM_MESSAGE = 'あなたは優秀なアシスタントです。簡潔に分�
 MODEL = 'gemini-2.5-flash-lite'
 ```
 
-### 3. 依存ライブラリのインストール
+### 3. デプロイ用 ZIP の作成
 
-バックエンド関数はいくつかのPythonライブラリを必要とします。これらを `lambda` ディレクトリ内にインストールします。
+AWS Lambda 実行環境に合わせて zip ファイルを作る必要があります。
+そのため、macOS で `pip install` したのでは駄目で、AWS Lambda公式ランタイムコンテナを使ったビルドが必要です。
+
+プロジェクトの `lambda` ディレクトリで以下を実行します。
+
+**【注意事項】**
+`colima` はDocker Desktopの代替として利用できるコンテナランタイムです。お使いの環境に合わせて、Docker DesktopやPodmanなどのDocker互換ランタイムを起動してください。
 
 ```bash
-cd lambda
-pip install -r requirements.txt -t .
+colima start
+docker run --rm -it --platform linux/arm64 \
+  -v "$PWD":/var/task \
+  public.ecr.aws/lambda/python:3.12 bash
 ```
 
-**注**: `-t .` フラグは、ライブラリをカレントディレクトリにインストールします。これはLambdaのデプロイパッケージを作成するために必要な手順です。
+- Lambda 関数の アーキテクチャ設定に合わせて `--platform` を変える
+    - `x86_64` → `--platform linux/amd64`
+    - `arm64` → `--platform linux/arm64`
 
-### 4. デプロイパッケージの作成
+コンテナに入っていなかった場合:
+```bash
+docker ps # コンテナIDを確認
+docker exec -it <コンテナID> /bin/bash
+```
 
-ライブラリをインストールした後、`lambda` ディレクトリ内のすべてのファイルを含むZIPファイルを作成します。
+コンテナに入ったら:
 
 ```bash
-# lambda ディレクトリにいることを確認してください
+python -m pip install --upgrade pip
+pip install --only-binary=:all: -r requirements.txt -t /var/task
+
+dnf install -y zip || yum install -y zip
+
+cd /var/task
 zip -r ../deployment_package.zip .
+mv ../deployment_package.zip ./
 ```
 
-これにより、プロジェクトのルートディレクトリに `deployment_package.zip` というファイルが作成されます。
+`deployment_package.zip` を Lambda にアップロードすればOKです。
 
-### 5. AlexaとAWSの設定
+### 4. AlexaとAWSの設定
 
 1.  **Alexaスキルの作成**:
     - Amazon開発者コンソールで、新しいカスタムスキルを作成します。
     - スキルのマニフェストとして `skill.json` の内容を使用します。
     - 対話モデルとして `interactionModels/custom/ja-JP.json` の内容を使用します。
+    **【ヒント】** Alexa Skills Kit CLI (ASK CLI) の `ask deploy` コマンドや、開発者コンソールからのスキルインポート機能を利用すると、`skill.json` や `interactionModels/custom/ja-JP.json` をより簡単にデプロイできます。
 2.  **AWS Lambda関数の作成**:
     - AWSマネジメントコンソールで、Pythonランタイムの新しいLambda関数を作成します。
     - 作成した `deployment_package.zip` をアップロードします。
@@ -82,11 +103,11 @@ zip -r ../deployment_package.zip .
 
 ## 使用方法
 
-デプロイ後、呼び出し名（"チャット"）を使ってスキルと会話を開始できます。
+デプロイ後、呼び出し名（"Gemini"）を使ってスキルと会話を開始できます。
 
-> **あなた**: アレクサ、チャットを開いて
+> **あなた**: アレクサ、Gemini
 >
-> **Alexa**: ようこそ。何が知りたいですか？
+> **Alexa**: Geminiです。
 >
 > **あなた**: 今日の天気は？
 >
