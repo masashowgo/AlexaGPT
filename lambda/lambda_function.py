@@ -59,7 +59,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .reprompt(speak_output)
+                .ask(speak_output)
                 .response
         )
 
@@ -88,7 +88,7 @@ class GeminiIntentHandler(AbstractRequestHandler):
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .reprompt("他に質問はありますか？")
+                .ask("他に質問はありますか？")
                 .response
         )
 
@@ -104,7 +104,7 @@ class HelpIntentHandler(AbstractRequestHandler):
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .reprompt(speak_output)
+                .ask(speak_output)
                 .response
         )
 
@@ -137,7 +137,7 @@ class FallbackIntentHandler(AbstractRequestHandler):
         logger.info("In FallbackIntentHandler")
         speech = "すみません、よくわかりませんでした。もう一度試してください。"
         reprompt = "もう一度試してください。"
-        return handler_input.response_builder.speak(speech).reprompt(reprompt).response
+        return handler_input.response_builder.speak(speech).ask(reprompt).response
 
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for Session End."""
@@ -179,7 +179,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .reprompt(speak_output)
+                .ask(speak_output)
                 .response
         )
 
