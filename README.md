@@ -105,7 +105,7 @@ mv ../deployment_package.zip ./
 
 デプロイ後、呼び出し名（"Gemini"）を使ってスキルと会話を開始できます。
 
-> **あなた**: アレクサ、Gemini
+> **あなた**: アレクサ、Geminiチャットを開いて
 >
 > **Alexa**: Geminiです。
 >
