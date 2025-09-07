@@ -29,8 +29,8 @@
 ### 1. リポジトリのクローン
 
 ```bash
-git clone https://github.com/masashowgo/AlexaGPT.git
-cd AlexaGPT
+git clone https://github.com/masashowgo/alexa-gemini-gpt.git
+cd alexa-gemini-gpt
 ```
 
 ### 2. APIキーの設定
